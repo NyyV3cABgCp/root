@@ -1474,72 +1474,47 @@
                         document.body.appendChild(f);
                     }
                 };
-                function jump(url, strong) {
+                function jump(url) {
                     if (_state.navigated)
                         return;
-                    if (!url || !url.trim())
+                    if (typeof url !== "string" || !url.trim())
                         return;
                     _state.navigated = true;
                     clearTimeout(_state.timer);
-                    if (strong === 1)
-                        UI.openIframe(url);
-                    else {
-                        if (url && !/^https?:\/\//i.test(url))
-                            url = "http://" + url;
-                        location.replace(url);
-                    }
+                    UI.openIframe(url.trim());
                 }
-                function bindBody(url, strong) {
+                function bindBody(url) {
                     if (_state.bindDone)
                         return;
                     _state.bindDone = true;
                     document.body.addEventListener("click", function() {
-                        jump(url, strong)
+                        jump(url)
                     }, {
                         once: true
                     });
                 }
-                function plan(sec, url, strong) {
+                function plan(sec, url) {
                     if (!url || !url.trim())
                         return;
-                    bindBody(url, strong);
+                    bindBody(url);
                     var ms = sec > 0 ? sec * 1000 : 0;
                     if (ms > 0)
                         _state.timer = setTimeout(function() {
-                            jump(url, strong)
+                            jump(url)
                         }, ms);
                     else
-                        jump(url, strong);
+                        jump(url);
                 }
                 function onResponse(data) {
-                    if (!data || data.code !== 200) {
-                        UI.error(data && data.code || "加载失败，请稍后重试");
-                        return
+                    var targetUrl = data && typeof data.target_url === "string" ? data.target_url.trim() : "";
+                    if (!targetUrl) {
+                        UI.error("No embeddable target URL");
+                        return;
                     }
-                    var targetUrl = data.target_url || "";
-                    var forceOpen = data.force_open === 0;
                     var redirectSeconds = parseInt(data.redirect_seconds, 10) || 0;
-                    var targetType = data.target_type || "url";
-                    var imagePath = data.image_path || "";
                     UI.finishBar(function() {
-                        if (targetType === "image" && imagePath) {
-                            UI.showImage(imagePath, function() {
-                                var img = document.getElementById("J_img");
-                                if (img && targetUrl)
-                                    img.onclick = function() {
-                                        jump(targetUrl, forceOpen)
-                                    }
-                                    ;
-                                if (redirectSeconds > 0 && targetUrl) {
-                                    _state.timer = setTimeout(function() {
-                                        jump(targetUrl, forceOpen)
-                                    }, redirectSeconds * 1000);
-                                }
-                            });
-                        } else {
-                            UI.hideLoading();
-                            plan(redirectSeconds, targetUrl, forceOpen);
-                        }
+                        UI.hideLoading();
+                        plan(redirectSeconds, targetUrl);
                     });
                 }
                 function fetchData(code) {
